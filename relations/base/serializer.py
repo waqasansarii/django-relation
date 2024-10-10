@@ -1,13 +1,17 @@
 from rest_framework import serializers
-from .models import Category,Student
+from .models import Category,Product
 
 class CategorySerializer (serializers.ModelSerializer):
     class Meta :
         model = Category
-        fields = '__all__'
+        fields = ['name','id']
 
-class StudentSerializer (serializers.ModelSerializer):
+class ProductSerializer (serializers.ModelSerializer):
+    category = CategorySerializer(required=False,allow_null=True)
+    
     class Meta :
-        model = Student
-        fields = '__all__'
+        model = Product
+        # fields = '__all__'
+        fields = ['id','name','description','price','category']
+        # exclude=['category']
         
