@@ -5,6 +5,14 @@ class Category(models.Model):
     description = models.TextField(null= True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    
+    
+class Supplier(models.Model):
+    name = models.CharField(max_length=200)
+    number = models.IntegerField()
+    email = models.EmailField(null=True,blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
 
 class Product(models.Model):
@@ -14,7 +22,10 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='products',null=True)
+    category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='productsCategory',null=True)
+    suppliers = models.ManyToManyField(Supplier, related_name='productsSupplier', blank=True,null=True)
     
+    
+
     
     

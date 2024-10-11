@@ -1,17 +1,26 @@
 from rest_framework import serializers
-from .models import Category,Product
+from .models import Category,Product,Supplier
 
 class CategorySerializer (serializers.ModelSerializer):
     class Meta :
         model = Category
-        fields = ['name','id']
+        fields = ['name','id','description']
 
-class ProductSerializer (serializers.ModelSerializer):
-    category = CategorySerializer(required=False,allow_null=True)
-    
+class SupplierSerializer (serializers.ModelSerializer):
     class Meta :
+        model = Supplier
+        fields = ['name','id','number','email']
+
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
+
+    suppliers = SupplierSerializer(many=True,read_only=True)
+    suppliers_id = serializers.ListField(write_only=True)
+
+    class Meta:
         model = Product
-        # fields = '__all__'
-        fields = ['id','name','description','price','category']
-        # exclude=['category']
-        
+        fields = ['id', 'name', 'description', 'price', 'quantity', 'category','suppliers','category_id','suppliers_id']        
+   
