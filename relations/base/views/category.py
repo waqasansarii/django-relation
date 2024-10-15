@@ -1,15 +1,17 @@
+from django.db.models import Count,Sum
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
 from rest_framework import status
 from ..models import Category
-from ..serializer import CategorySerializer
+from ..serializer import CategorySerializer,CategoryProductSerializer
 
 @api_view(['GET','POST'])
 def get_create_category(req:Request):
     if req.method =='GET':
-        category = Category.objects.all()
-        data = CategorySerializer(category,many=True)
+        category = Category.objects.prefetch_related('productsCategory').all()
+        data = CategoryProductSerializer(category,many=True)
         return Response(data.data,status.HTTP_200_OK)
     
     if req.method=='POST':
@@ -55,3 +57,15 @@ def get_update_delete_category(req:Request,id):
         # throw an error if category does not exist 
         except Category.DoesNotExist:
             return Response({'detail': 'category not found'}, status=status.HTTP_404_NOT_FOUND)   
+
+
+@api_view(['GET'])
+def category_matrics(req:Request):
+    categor_id = req.query_params.get('category_id')
+    filters={}
+    if categor_id is not None:
+        filters['id'] = categor_id
+
+    product = Category.objects.filter(**filters).aggregate(total_products=Count('productsCategory'),stock=Sum('productsCategory__quantity'))
+    product_stock=product['stock'] or 0
+    return Response({"total_product":product['total_products'],"product_stock":product_stock},status.HTTP_200_OK)    
